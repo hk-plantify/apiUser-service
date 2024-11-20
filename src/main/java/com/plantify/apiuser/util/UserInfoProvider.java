@@ -1,4 +1,4 @@
-package com.plantify.apiuser.client;
+package com.plantify.apiuser.util;
 
 import com.plantify.apiuser.domain.dto.response.AuthUserResponse;
 import com.plantify.apiuser.global.exception.ApplicationException;

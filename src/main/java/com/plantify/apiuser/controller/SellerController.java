@@ -30,7 +30,6 @@ public class SellerController {
         return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
-
     @PostMapping("/")
     public ResponseEntity<ApiResponse<SellerResponse>> createSeller(
             @RequestBody SellerRequest request) {

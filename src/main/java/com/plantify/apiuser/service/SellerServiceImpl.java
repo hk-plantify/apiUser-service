@@ -1,6 +1,6 @@
 package com.plantify.apiuser.service;
 
-import com.plantify.apiuser.client.UserInfoProvider;
+import com.plantify.apiuser.util.UserInfoProvider;
 import com.plantify.apiuser.domain.dto.request.SellerRequest;
 import com.plantify.apiuser.domain.dto.response.SellerResponse;
 import com.plantify.apiuser.domain.entity.Seller;
@@ -19,7 +19,6 @@ public class SellerServiceImpl implements SellerService {
 
     private final SellerRepository sellerRepository;
     private final UserInfoProvider userInfoProvider;
-    private final InternalService internalService;
 
     @Override
     public List<SellerResponse> getAllSellers() {
@@ -33,27 +32,20 @@ public class SellerServiceImpl implements SellerService {
     public SellerResponse getSeller(Long sellerId) {
         Seller seller = sellerRepository.findById(sellerId)
                 .orElseThrow(() -> new ApplicationException(SellerErrorCode.SELLER_NOT_FOUND));
-        Long adminId = userInfoProvider.getUserInfo().userId();
-
-        internalService.recordActivityLog("APIUSER", sellerId, "VIEW", adminId);
 
         return SellerResponse.from(seller);
     }
 
     @Override
     public SellerResponse createSeller(SellerRequest request) {
-        Long adminId = userInfoProvider.getUserInfo().userId();
         Seller seller = request.toEntity();
         Seller savedSeller = sellerRepository.save(seller);
-
-        internalService.recordActivityLog("APIUSER", seller.getSellerId(), "CREATE", adminId);
 
         return SellerResponse.from(savedSeller);
     }
 
     @Override
     public SellerResponse updateSeller(Long sellerId, SellerRequest request) {
-        Long adminId = userInfoProvider.getUserInfo().userId();
         Seller seller = sellerRepository.findById(sellerId)
                 .orElseThrow(() -> new ApplicationException(SellerErrorCode.SELLER_NOT_FOUND));
 
@@ -67,8 +59,6 @@ public class SellerServiceImpl implements SellerService {
 
         Seller savedSeller = sellerRepository.save(updatedSeller);
 
-        internalService.recordActivityLog("APIUSER", sellerId, "UPDATE", adminId);
-
         return SellerResponse.from(savedSeller);
     }
 
@@ -79,8 +69,5 @@ public class SellerServiceImpl implements SellerService {
                 .orElseThrow(() -> new ApplicationException(SellerErrorCode.SELLER_NOT_FOUND));
 
         sellerRepository.delete(seller);
-
-        internalService.recordActivityLog("APIUSER", sellerId, "DELETE", adminId);
-
     }
 }
