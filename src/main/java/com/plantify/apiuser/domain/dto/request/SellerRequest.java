@@ -4,6 +4,7 @@ import com.plantify.apiuser.domain.entity.Seller;
 import com.plantify.apiuser.domain.entity.Status;
 
 public record SellerRequest(
+        Long sellerId,
         String name,
         String contactInfo,
         String businessInfo,
@@ -18,6 +19,16 @@ public record SellerRequest(
                 .businessInfo(businessInfo)
                 .status(Status.ACTIVE)
                 .redirectUrl(redirectUrl)
+                .build();
+    }
+
+    public Seller updatedSeller(Seller seller) {
+        return seller.toBuilder()
+                .name(this.name())
+                .contactInfo(this.contactInfo())
+                .businessInfo(this.businessInfo())
+                .status(this.status())
+                .redirectUrl(this.redirectUrl())
                 .build();
     }
 }

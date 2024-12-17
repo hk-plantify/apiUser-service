@@ -1,6 +1,5 @@
 package com.plantify.apiuser.service;
 
-import com.plantify.apiuser.util.UserInfoProvider;
 import com.plantify.apiuser.domain.dto.request.SellerRequest;
 import com.plantify.apiuser.domain.dto.response.SellerResponse;
 import com.plantify.apiuser.domain.entity.Seller;
@@ -11,21 +10,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class SellerServiceImpl implements SellerService {
 
     private final SellerRepository sellerRepository;
-    private final UserInfoProvider userInfoProvider;
 
     @Override
     public List<SellerResponse> getAllSellers() {
         return sellerRepository.findAll()
                 .stream()
                 .map(SellerResponse::from)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -40,34 +37,30 @@ public class SellerServiceImpl implements SellerService {
     public SellerResponse createSeller(SellerRequest request) {
         Seller seller = request.toEntity();
         Seller savedSeller = sellerRepository.save(seller);
-
         return SellerResponse.from(savedSeller);
     }
 
     @Override
-    public SellerResponse updateSeller(Long sellerId, SellerRequest request) {
-        Seller seller = sellerRepository.findById(sellerId)
+    public SellerResponse updateSeller(SellerRequest request) {
+        Seller seller = sellerRepository.findById(request.sellerId())
                 .orElseThrow(() -> new ApplicationException(SellerErrorCode.SELLER_NOT_FOUND));
 
-        Seller updatedSeller = seller.toBuilder()
-                .name(request.name())
-                .contactInfo(request.contactInfo())
-                .businessInfo(request.businessInfo())
-                .status(request.status())
-                .redirectUrl(request.redirectUrl())
-                .build();
-
+        Seller updatedSeller = request.updatedSeller(seller);
         Seller savedSeller = sellerRepository.save(updatedSeller);
-
         return SellerResponse.from(savedSeller);
     }
 
     @Override
     public void deleteSeller(Long sellerId) {
-        Long adminId = userInfoProvider.getUserInfo().userId();
         Seller seller = sellerRepository.findById(sellerId)
                 .orElseThrow(() -> new ApplicationException(SellerErrorCode.SELLER_NOT_FOUND));
-
         sellerRepository.delete(seller);
+    }
+
+    @Override
+    public SellerResponse getSellerByName(String name) {
+        Seller seller = sellerRepository.findByName(name)
+                .orElseThrow(() -> new ApplicationException(SellerErrorCode.SELLER_NOT_FOUND));
+        return SellerResponse.from(seller);
     }
 }

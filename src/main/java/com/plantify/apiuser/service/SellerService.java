@@ -10,6 +10,7 @@ public interface SellerService {
     List<SellerResponse> getAllSellers();
     SellerResponse getSeller(Long sellerId);
     SellerResponse createSeller(SellerRequest request);
-    SellerResponse updateSeller(Long sellerId, SellerRequest request);
+    SellerResponse updateSeller(SellerRequest request);
     void deleteSeller(Long sellerId);
+    SellerResponse getSellerByName(String name);
 }
